@@ -1,0 +1,25 @@
+{
+	"bind-host": "0.0.0.0",
+	"bind-port": 5000,
+	"repository": "/tmp/files",
+	"servers": [
+		{
+			"mac": "00:00:00:00:00:00",
+			"kernel": "http://localhost:5000/api/v1/static/images/coreos_production_pxe.vmlinuz",
+			"initrd": [ "http://localhost:5000/api/v1/static/images/coreos_production_pxe_image.cpio.gz" ],
+			"cmdline": {
+				"sshkey": "...",
+				"coreos.autologin": "true"
+			}
+		},
+		{
+			"mac": "11:11:11:11:11:11",
+			"kernel": "http://localhost:5000/api/v1/static/images/coreos_production_pxe.vmlinuz",
+			"initrd": [ "http://localhost:5000/api/v1/static/images/coreos_production_pxe_image.cpio.gz" ],
+			"cmdline": {
+				"sshkey": "...",
+				"coreos.autologin": "true"
+			}
+		}
+	]
+}
