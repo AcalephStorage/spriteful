@@ -9,7 +9,7 @@
 			"initrd": [ "http://localhost:5000/api/v1/static/images/coreos_production_pxe_image.cpio.gz" ],
 			"cmdline": {
 				"sshkey": "...",
-				"coreos.autologin": "true"
+				"coreos.autologin": true
 			}
 		},
 		{
@@ -18,7 +18,7 @@
 			"initrd": [ "http://localhost:5000/api/v1/static/images/coreos_production_pxe_image.cpio.gz" ],
 			"cmdline": {
 				"sshkey": "...",
-				"coreos.autologin": "true"
+				"coreos.autologin": true
 			}
 		}
 	]
