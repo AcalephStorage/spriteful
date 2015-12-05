@@ -157,7 +157,7 @@ func (s *Spriteful) findServerConfig(macAddress string) (*Server, error) {
 // findResource returns the full resource path if the requested resource exists.
 // Returns an error if the resource does not exist.
 func (s *Spriteful) findResource(resource string) (string, error) {
-	logrus.Info(`requesting resource "%s".`, resource)
+	logrus.Infof(`requesting resource "%s".`, resource)
 	resourcePath := path.Join(s.Repository, resource)
 	if _, err := os.Stat(resourcePath); os.IsNotExist(err) {
 		logrus.Warn("resource does not exist.")
