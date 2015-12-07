@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -14,7 +15,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os/signal"
+	"text/template"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/emicklei/go-restful"
@@ -47,7 +50,7 @@ type (
 	PixieResponse struct {
 		Kernel      string                 `json:"kernel"`
 		Initrd      []string               `json:"initrd"`
-		CommandLine map[string]interface{} `json:"cmdline"`
+		CommandLine map[string]interface{} `json:"cmdline,string"`
 	}
 )
 
@@ -69,6 +72,7 @@ func main() {
 	logrus.Infof(`Config "%s" loaded.`, *config)
 
 	sprite.startApi()
+
 }
 
 // startApi starts the Spriteful API.
@@ -108,6 +112,9 @@ func (s *Spriteful) register(container *restful.Container) {
 		Param(ws.PathParameter("resource", "the resource file")))
 	logrus.Info(`static endpoint created at "api/v1/static/{.*}".`)
 
+	ws.Route(ws.GET("/template/{template:*}").To(s.handleTemplateRequest).
+		Param(ws.PathParameter("template", "the template file")))
+
 	container.Add(ws)
 }
 
@@ -118,13 +125,31 @@ func (s *Spriteful) handleBootRequest(req *restful.Request, res *restful.Respons
 	server, err := s.findServerConfig(macAddress)
 	if err != nil {
 		res.WriteError(http.StatusNotFound, err)
-	} else {
-		res.WriteEntity(&PixieResponse{
-			Kernel:      server.Kernel,
-			Initrd:      server.Initrd,
-			CommandLine: server.CommandLine,
-		})
+		return
 	}
+
+	str, err := json.Marshal(&PixieResponse{
+		Kernel:      server.Kernel,
+		Initrd:      server.Initrd,
+		CommandLine: server.CommandLine,
+	})
+	if err != nil {
+		res.WriteError(http.StatusBadRequest, err)
+		return
+	}
+
+	str = bytes.Replace(str, []byte("\\u003c"), []byte("<"), -1)
+	str = bytes.Replace(str, []byte("\\u003e"), []byte(">"), -1)
+	str = bytes.Replace(str, []byte("\\u0026"), []byte("&"), -1)
+
+	value := string(str)
+	value, err = url.QueryUnescape(value)
+	if err != nil {
+		res.WriteError(http.StatusBadRequest, err)
+		return
+	}
+
+	fmt.Fprint(res.ResponseWriter, value)
 }
 
 // handleResourceRequest handles the http request for static  resources.
@@ -137,6 +162,55 @@ func (s *Spriteful) handleResourceRequest(req *restful.Request, res *restful.Res
 		res.WriteError(http.StatusNotFound, err)
 	} else {
 		http.ServeFile(res.ResponseWriter, req.Request, resourcePath)
+	}
+}
+
+func (s *Spriteful) handleTemplateRequest(req *restful.Request, res *restful.Response) {
+	logrus.Info("Received template request...")
+	tmpl := req.PathParameter("template")
+
+	tmplPath, err := s.findResource(tmpl)
+	if err != nil {
+		res.WriteError(http.StatusNotFound, err)
+		return
+	}
+
+	data, err := ioutil.ReadFile(tmplPath)
+	if err != nil {
+		res.WriteError(http.StatusBadRequest, err)
+		return
+	}
+
+	// query by default is map[string][]string, this looks awkward during templating,
+	// so we simplify it to just map[string]string
+	tmplData := make(map[string]string)
+	rawQuery := req.Request.URL.RawQuery
+	kvpair := strings.Split(rawQuery, "&")
+	for _, kv := range kvpair {
+		kvsplit := strings.SplitN(kv, "=", 2)
+		if len(kvsplit) != 2 {
+			res.WriteErrorString(http.StatusBadRequest, "invalid query param for template")
+			return
+		}
+		key := kvsplit[0]
+		val := kvsplit[1]
+		val, err := url.QueryUnescape(val)
+		if err != nil {
+			res.WriteError(http.StatusBadRequest, err)
+			return
+		}
+		tmplData[key] = val
+	}
+
+	tf, err := template.New("templateFile").Parse(string(data))
+	if err != nil {
+		res.WriteError(http.StatusBadRequest, err)
+		return
+	}
+
+	err = tf.Execute(res.ResponseWriter, tmplData)
+	if err != nil {
+		res.WriteError(http.StatusBadRequest, err)
 	}
 }
 
