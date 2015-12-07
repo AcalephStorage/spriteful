@@ -7,38 +7,39 @@ See [pixiecore](https://github.com/danderson/pixiecore).
 
 ## Building
 
-To build spriteful, go v1.5+ is needed and the `GO15VENDOREXPERIMENT` should be enabled.
+To build spriteful, [gb](http://getgb.io/) is needed.
 
-```
-$ export GO15VENDOREXPERIMENT=1
+``` sh
+go get github.com/constabulary/gb/...
 ```
 
 then, clone the repo:
 
-```
-$ git clone https://github.com/AcalephStorage/spriteful.git
-$ cd spriteful
+```shell
+git clone https://github.com/AcalephStorage/spriteful.git
+cd spriteful
 ```
 
-then, load the submodules (dependencies):
+then, restore dependencies:
 
-```
-$ git submodule init
-$ git submodule update
+```shell
+gb vendor restore
 ```
 
 and finally, build the binary:
 
+```shell
+gb build
 ```
-$ go build .
-```
+
+Binary can be found in `bin/` directory.
 
 ## Running
 
 To run spriteful, use the following command:
 
-```
-$ spriteful -config /path/to/config/file
+```shell
+spriteful -config /path/to/config/file
 ```
 
 a sample config file is provided [here](config.json.example).
