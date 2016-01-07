@@ -1,6 +1,6 @@
 language: go
 go:
-- 1.5
+- tip
 install:
   - go get github.com/constabulary/gb/...
   - go get github.com/golang/lint/golint
@@ -23,4 +23,3 @@ deploy:
   on:
     repo: AcalephStorage/spriteful
     tags: true
-    go: 1.5
