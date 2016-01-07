@@ -112,6 +112,10 @@ func (s *Spriteful) register(container *restful.Container) {
 		Param(ws.PathParameter("resource", "the resource file")))
 	logrus.Info(`static endpoint created at "api/v1/static/{.*}".`)
 
+	ws.Route(ws.HEAD("/static/{resource:*}").To(s.handleResourceRequest).
+		Param(ws.PathParameter("resource", "the resource file")))
+	logrus.Info(`static endpoint created at "api/v1/static/{.*}".`)
+
 	ws.Route(ws.GET("/template/{template:*}").To(s.handleTemplateRequest).
 		Param(ws.PathParameter("template", "the template file")))
 
