@@ -14,11 +14,11 @@ deps:
 	@echo "--> Getting dependencies"
 	@gb vendor restore
 
-test: format
+test:
 	@echo "--> Testing application"
 	@gb test ...
 
-build: format deps
+build: format deps test
 	@echo "--> Building application"
 	@gb build ...
 	@tar cf bin/${APP_NAME}-linux-amd64.tar -C bin ${APP_NAME}
