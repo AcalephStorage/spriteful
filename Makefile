@@ -1,6 +1,6 @@
 APP_NAME = spriteful
 
-all: build
+all: clean format deps test build
 
 clean:
 	@echo "--> Cleaning build"
@@ -18,7 +18,7 @@ test:
 	@echo "--> Testing application"
 	@gb test ...
 
-build: format deps test
+build: format test
 	@echo "--> Building application"
 	@gb build ...
 	@tar cf bin/${APP_NAME}-linux-amd64.tar -C bin ${APP_NAME}
