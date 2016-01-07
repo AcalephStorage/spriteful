@@ -7,7 +7,7 @@ install:
   - go get github.com/golang/lint/golint
 before_script:
 script: 
-  - make
+  - make clean deps build 
   - go tool vet src/
   - golint src/
 before_deploy:
