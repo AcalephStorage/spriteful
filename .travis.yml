@@ -9,7 +9,7 @@ env:
 install:
   - go get github.com/constabulary/gb/...
 
-script: make build
+script: make
 
 deploy:
   provider: releases
