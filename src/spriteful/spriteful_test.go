@@ -11,6 +11,7 @@ var (
 	validRoutes = []string{
 		"/api/v1/boot/{mac-addr}",
 		"/api/v1/static/{resource:*}",
+		"/api/v1/template/{template:*}",
 	}
 	validMac    = "00:00:00:00:00:00"
 	invalidMac  = "00:00:00:00:00:01"
@@ -28,8 +29,8 @@ func TestRouteRegister(t *testing.T) {
 	}
 	service := services[0]
 	routes := service.Routes()
-	if routeCount := len(routes); routeCount != 2 {
-		t.Errorf("only two routes are expected. routes: %d", routeCount)
+	if routeCount := len(routes); routeCount != 4 {
+		t.Errorf("only four routes are expected. routes: %d", routeCount)
 	}
 
 	for _, route := range routes {
