@@ -1,21 +1,27 @@
 language: go
-
 go:
-  - 1.5.1
-
-env:
-  - GIMME_OS=linux GIMME_ARCH=amd64
-
+- 1.5.1
+- tip
 install:
   - go get github.com/constabulary/gb/...
-
-script: make
+  - go get github.com/golang/lint/golint
+before_script:
+script: 
+  - make
+  - go tool vet src/
+  - golint src/
+before_deploy:
+  - GOARCH=arm GOOS=linux gb build
+  - GOARCH=386 GOOS=linux gb build
+  - GOARCH=amd64 GOOS=linux gb build
 
 deploy:
   provider: releases
   api_key:
     secure: nvpuGqNAUQZMdn/rWjikBdEqck3XuZ0m00o6EVtb2NVvSDHqpfnQ+irQkeWQhDLTnKLu0Pqjo2+nk2+nsFC/+tg694LzTv5PfM2KDcgQ1sJ0l6+K7zzSZR7z6nD/vuOhKgBYu9ETLwlcV3Qiq3lb+8/kKckd+XPx7FcU1JPPqZ4vXFK0xt4YWbvNNtg97U9Bg27HybCQ5G+9HxpKIAhuLtBbHGkmIsQ9EBQ0fBrSl7FqY4aCD1y1XQm8XzXm55nsK0pKgooAVgrmNxP3fDLB9bBCpcIKz+Vf4vUK6cB24ij0pJKoZFOQM80t6ye4aoRb8Dy0wQfWPCakK52AgHf7dbxY5yMv0gwxJBZGxYDkI2Q2Rp4mW0mxlQf95kcD6H3v3Zq+Ja8GI5cV1ZXToXzuRKkMWvtz6Cf0NK4bWIpN5pNju1ZOkMhVA2U8MwVBizRSdhmStC6vCdVpP4dnR0u933xIPuKv2VLOx4DbclYVIk9xUgGyVjFNma/DYcsneD8On92Y8893SVVsespSdj1B41C14iEuN+s3GD93T0R9WuuW3owZjnX94OOz9qs6R0G+xWt7rbfninukPtpVs6bH2mC12AsgYhI2n9V/YstqeKgtn4gD0oAuFCWZw0t7xMntCgWRlIwNyLUc18QiPuScZyfVq+GAnd+cdP5TZEErpFI=
-  file: bin/spriteful-linux-amd64.tar
-  skip_cleanup: true
+  file: bin/*
+  file_glob: true
   on:
+    repo: AcalephStorage/spriteful
     tags: true
+    go: 1.5.1

@@ -1,6 +1,6 @@
 APP_NAME = spriteful
 
-all: clean format deps test build
+all: clean deps build
 
 clean:
 	@echo "--> Cleaning build"
@@ -14,7 +14,7 @@ deps:
 	@echo "--> Getting dependencies"
 	@gb vendor restore
 
-test:
+test: format
 	@echo "--> Testing application"
 	@gb test ...
 
