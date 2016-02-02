@@ -21,5 +21,5 @@ test: format
 build: format test
 	@echo "--> Building application"
 	@gb build ...
-	@tar cf bin/${APP_NAME}-linux-amd64.tar -C bin ${APP_NAME}
+	@tar cfz bin/${APP_NAME}-linux-amd64.tar.gz -C bin ${APP_NAME}
 	@rm bin/${APP_NAME}
