@@ -3,7 +3,7 @@ go:
 - tip
 install:
   - go get github.com/constabulary/gb/...
-  - go get github.com/golang/lint/golint
+  - go get golang.org/x/lint/golint
 before_script:
 script: 
   - make clean deps build 
